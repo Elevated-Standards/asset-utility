@@ -1,4 +1,5 @@
 import { MaintenanceSchedule } from '../models/maintenanceSchedule';
+import { MaintenanceScheduleNotFoundError } from '../utils/errors';
 
 /**
  * Service for managing maintenance schedules for assets.
@@ -60,11 +61,14 @@ export class MaintenanceService {
      * 
      * @param scheduleId - The ID of the maintenance schedule to update
      * @param updates - The fields to update and their new values
-     * @returns The updated schedule or null if not found
+     * @returns The updated schedule
+     * @throws {MaintenanceScheduleNotFoundError} If schedule is not found
      */
-    updateMaintenanceSchedule(scheduleId: string, updates: Partial<MaintenanceSchedule>): MaintenanceSchedule | null {
+    updateMaintenanceSchedule(scheduleId: string, updates: Partial<MaintenanceSchedule>): MaintenanceSchedule {
         const index = this.maintenanceSchedules.findIndex(schedule => schedule.id === scheduleId);
-        if (index === -1) return null;
+        if (index === -1) {
+            throw new MaintenanceScheduleNotFoundError(scheduleId);
+        }
 
         const updatedSchedule: MaintenanceSchedule = {
             ...this.maintenanceSchedules[index],
@@ -80,23 +84,29 @@ export class MaintenanceService {
      * Retrieves a specific maintenance schedule by its ID.
      * 
      * @param scheduleId - The ID of the maintenance schedule to find
-     * @returns The maintenance schedule or null if not found
+     * @returns The maintenance schedule
+     * @throws {MaintenanceScheduleNotFoundError} If schedule is not found
      */
-    getScheduleById(scheduleId: string): MaintenanceSchedule | null {
-        return this.maintenanceSchedules.find(schedule => schedule.id === scheduleId) || null;
+    getScheduleById(scheduleId: string): MaintenanceSchedule {
+        const schedule = this.maintenanceSchedules.find(schedule => schedule.id === scheduleId);
+        if (!schedule) {
+            throw new MaintenanceScheduleNotFoundError(scheduleId);
+        }
+        return schedule;
     }
 
     /**
      * Cancels a maintenance schedule.
      * 
      * @param scheduleId - The ID of the maintenance schedule to cancel
-     * @returns true if cancelled successfully, false if schedule not found
+     * @throws {MaintenanceScheduleNotFoundError} If schedule is not found
      */
-    cancelSchedule(scheduleId: string): boolean {
+    cancelSchedule(scheduleId: string): void {
         const index = this.maintenanceSchedules.findIndex(schedule => schedule.id === scheduleId);
-        if (index === -1) return false;
+        if (index === -1) {
+            throw new MaintenanceScheduleNotFoundError(scheduleId);
+        }
 
         this.maintenanceSchedules.splice(index, 1);
-        return true;
     }
 }

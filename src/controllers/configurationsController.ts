@@ -9,10 +9,6 @@ export const createConfiguration = async (req: Request, res: Response) => {
         const newConfig: AssetConfiguration = {
             ...req.body,
             id: Date.now().toString(),
-            compliance: {
-                status: 'pending',
-                lastChecked: new Date()
-            },
             createdAt: new Date(),
             updatedAt: new Date()
         };

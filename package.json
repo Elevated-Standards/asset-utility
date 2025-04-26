@@ -1,18 +1,32 @@
 {
-  "name": "asset-inventory-management",
+  "name": "asset-utility",
   "version": "1.0.0",
-  "description": "A project for managing asset inventory with cloud service provider integrations and maintenance scheduling.",
-  "main": "src/app.ts",
+  "description": "A library for managing asset inventory with cloud service provider integrations and maintenance scheduling.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "require": "./dist/index.js",
+      "import": "./dist/index.mjs"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
   "scripts": {
-    "start": "ts-node src/app.ts",
     "build": "tsc",
-    "test": "jest"
+    "test": "jest",
+    "prepare": "npm run build"
   },
   "dependencies": {
-    "express": "^4.17.1",
     "aws-sdk": "^2.1030.0",
     "@azure/arm-compute": "^17.0.0",
     "@azure/identity": "^2.0.1"
+  },
+  "peerDependencies": {
+    "express": "^4.17.1"
   },
   "devDependencies": {
     "typescript": "^4.5.4",
@@ -20,11 +34,12 @@
     "jest": "^27.0.6",
     "@types/jest": "^27.0.2",
     "@types/express": "^4.17.13",
-    "@types/node": "^16.11.7"
+    "@types/node": "^16.11.7",
+    "express": "^4.17.1"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/yourusername/asset-inventory-management.git"
+    "url": "https://github.com/yourusername/asset-utility.git"
   },
   "keywords": [
     "asset",

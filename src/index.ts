@@ -11,6 +11,17 @@ export * from './models/maintenanceSchedule';
 export { MaintenanceService } from './services/maintenanceService';
 export { AssetService } from './services/assetService';
 export { CloudIntegrationService } from './services/cloudIntegrationService';
+export { DependencyService } from './services/dependencyService';
+
+// Error types
+export { 
+    AssetUtilityError,
+    AssetNotFoundError,
+    MaintenanceScheduleNotFoundError,
+    CloudIntegrationError,
+    ConfigurationError,
+    InvalidOperationError 
+} from './utils/errors';
 
 // Express middleware and route handlers (optional imports for Express users)
 export { default as assetsRoutes } from './routes/assetsRoutes';

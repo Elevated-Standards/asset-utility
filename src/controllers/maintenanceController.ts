@@ -1,25 +1,78 @@
-export class MaintenanceController {
-    constructor(private maintenanceService: any) {}
+import { Request, Response } from 'express';
+import { MaintenanceSchedule } from '../models/maintenanceSchedule';
 
-    scheduleMaintenance(req: any, res: any) {
-        const { assetId, scheduleDate, maintenanceDetails } = req.body;
-        this.maintenanceService.scheduleMaintenance(assetId, scheduleDate, maintenanceDetails)
-            .then((result: any) => res.status(201).json(result))
-            .catch((error: any) => res.status(500).json({ error: error.message }));
+// Temporary in-memory storage (replace with database in production)
+let maintenanceSchedules: MaintenanceSchedule[] = [];
+let maintenanceHistory: MaintenanceSchedule[] = [];
+
+export const scheduleMaintenance = async (req: Request, res: Response) => {
+    try {
+        const newSchedule: MaintenanceSchedule = {
+            ...req.body,
+            id: Date.now().toString(),
+            status: 'scheduled',
+            createdAt: new Date(),
+            updatedAt: new Date()
+        };
+        maintenanceSchedules.push(newSchedule);
+        res.status(201).json(newSchedule);
+    } catch (error) {
+        res.status(400).json({ error: 'Invalid maintenance schedule data' });
+    }
+};
+
+export const getAllMaintenance = async (req: Request, res: Response) => {
+    res.json(maintenanceSchedules);
+};
+
+export const getMaintenanceHistory = async (req: Request, res: Response) => {
+    res.json(maintenanceHistory);
+};
+
+export const getMaintenanceById = async (req: Request, res: Response) => {
+    const schedule = maintenanceSchedules.find(m => m.id === req.params.id);
+    if (!schedule) {
+        return res.status(404).json({ error: 'Maintenance schedule not found' });
+    }
+    res.json(schedule);
+};
+
+export const updateMaintenance = async (req: Request, res: Response) => {
+    const index = maintenanceSchedules.findIndex(m => m.id === req.params.id);
+    if (index === -1) {
+        return res.status(404).json({ error: 'Maintenance schedule not found' });
     }
 
-    getMaintenanceHistory(req: any, res: any) {
-        const { assetId } = req.params;
-        this.maintenanceService.getMaintenanceHistory(assetId)
-            .then((history: any) => res.status(200).json(history))
-            .catch((error: any) => res.status(500).json({ error: error.message }));
+    const updatedSchedule = {
+        ...maintenanceSchedules[index],
+        ...req.body,
+        id: req.params.id,
+        updatedAt: new Date()
+    };
+
+    if (req.body.status === 'completed') {
+        maintenanceHistory.push(updatedSchedule);
+        maintenanceSchedules.splice(index, 1);
+    } else {
+        maintenanceSchedules[index] = updatedSchedule;
     }
 
-    updateMaintenanceSchedule(req: any, res: any) {
-        const { assetId } = req.params;
-        const { scheduleDate, maintenanceDetails } = req.body;
-        this.maintenanceService.updateMaintenanceSchedule(assetId, scheduleDate, maintenanceDetails)
-            .then((result: any) => res.status(200).json(result))
-            .catch((error: any) => res.status(500).json({ error: error.message }));
+    res.json(updatedSchedule);
+};
+
+export const cancelMaintenance = async (req: Request, res: Response) => {
+    const index = maintenanceSchedules.findIndex(m => m.id === req.params.id);
+    if (index === -1) {
+        return res.status(404).json({ error: 'Maintenance schedule not found' });
     }
-}
+
+    const cancelledSchedule = {
+        ...maintenanceSchedules[index],
+        status: 'cancelled',
+        updatedAt: new Date()
+    };
+
+    maintenanceHistory.push(cancelledSchedule);
+    maintenanceSchedules.splice(index, 1);
+    res.status(204).send();
+};

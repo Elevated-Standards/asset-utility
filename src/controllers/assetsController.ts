@@ -1,30 +1,58 @@
-class AssetsController {
-    constructor() {
-        // Initialize any required properties or services here
-    }
+import { Request, Response } from 'express';
+import { Asset } from '../models/asset';
 
-    createAsset(req, res) {
-        // Logic for creating a new asset
-        res.status(201).send("Asset created");
-    }
+// Temporary in-memory storage (replace with database in production)
+let assets: Asset[] = [];
 
-    getAsset(req, res) {
-        // Logic for retrieving an asset by ID
-        const assetId = req.params.id;
-        res.status(200).send(`Asset details for ID: ${assetId}`);
+export const createAsset = async (req: Request, res: Response) => {
+    try {
+        const newAsset: Asset = {
+            ...req.body,
+            id: Date.now().toString(),
+            createdAt: new Date(),
+            updatedAt: new Date()
+        };
+        assets.push(newAsset);
+        res.status(201).json(newAsset);
+    } catch (error) {
+        res.status(400).json({ error: 'Invalid asset data' });
     }
+};
 
-    updateAsset(req, res) {
-        // Logic for updating an existing asset
-        const assetId = req.params.id;
-        res.status(200).send(`Asset with ID: ${assetId} updated`);
+export const getAllAssets = async (req: Request, res: Response) => {
+    res.json(assets);
+};
+
+export const getAssetById = async (req: Request, res: Response) => {
+    const asset = assets.find(a => a.id === req.params.id);
+    if (!asset) {
+        return res.status(404).json({ error: 'Asset not found' });
     }
+    res.json(asset);
+};
 
-    deleteAsset(req, res) {
-        // Logic for deleting an asset by ID
-        const assetId = req.params.id;
-        res.status(204).send(`Asset with ID: ${assetId} deleted`);
+export const updateAsset = async (req: Request, res: Response) => {
+    const index = assets.findIndex(a => a.id === req.params.id);
+    if (index === -1) {
+        return res.status(404).json({ error: 'Asset not found' });
     }
-}
+    
+    assets[index] = {
+        ...assets[index],
+        ...req.body,
+        id: req.params.id,
+        updatedAt: new Date()
+    };
+    
+    res.json(assets[index]);
+};
 
-export default AssetsController;
+export const deleteAsset = async (req: Request, res: Response) => {
+    const index = assets.findIndex(a => a.id === req.params.id);
+    if (index === -1) {
+        return res.status(404).json({ error: 'Asset not found' });
+    }
+    
+    assets.splice(index, 1);
+    res.status(204).send();
+};

@@ -1,11 +1,15 @@
-export class MaintenanceSchedule {
+export interface MaintenanceSchedule {
+    id: string;
     assetId: string;
-    scheduleDate: Date;
-    maintenanceDetails: string;
-
-    constructor(assetId: string, scheduleDate: Date, maintenanceDetails: string) {
-        this.assetId = assetId;
-        this.scheduleDate = scheduleDate;
-        this.maintenanceDetails = maintenanceDetails;
-    }
+    title: string;
+    description: string;
+    startDate: Date;
+    endDate: Date;
+    status: 'scheduled' | 'in-progress' | 'completed' | 'cancelled';
+    type: 'preventive' | 'corrective' | 'predictive';
+    assignedTo: string;
+    priority: 'low' | 'medium' | 'high' | 'critical';
+    notes?: string;
+    createdAt: Date;
+    updatedAt: Date;
 }

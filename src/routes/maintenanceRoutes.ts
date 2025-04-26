@@ -1,13 +1,20 @@
 import { Router } from 'express';
-import MaintenanceController from '../controllers/maintenanceController';
+import {
+    scheduleMaintenance,
+    getAllMaintenance,
+    getMaintenanceHistory,
+    getMaintenanceById,
+    updateMaintenance,
+    cancelMaintenance
+} from '../controllers/maintenanceController';
 
 const router = Router();
-const maintenanceController = new MaintenanceController();
 
-router.post('/schedule', maintenanceController.scheduleMaintenance.bind(maintenanceController));
-router.get('/history/:assetId', maintenanceController.getMaintenanceHistory.bind(maintenanceController));
-router.put('/update/:scheduleId', maintenanceController.updateMaintenanceSchedule.bind(maintenanceController));
+router.post('/', scheduleMaintenance);
+router.get('/', getAllMaintenance);
+router.get('/history', getMaintenanceHistory);
+router.get('/:id', getMaintenanceById);
+router.put('/:id', updateMaintenance);
+router.delete('/:id', cancelMaintenance);
 
-export default function setMaintenanceRoutes(app) {
-    app.use('/api/maintenance', router);
-}
+export default router;

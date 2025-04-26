@@ -43,14 +43,14 @@ export const updateMaintenance = async (req: Request, res: Response) => {
         return res.status(404).json({ error: 'Maintenance schedule not found' });
     }
 
-    const updatedSchedule = {
+    const updatedSchedule: MaintenanceSchedule = {
         ...maintenanceSchedules[index],
         ...req.body,
         id: req.params.id,
         updatedAt: new Date()
     };
 
-    if (req.body.status === 'completed') {
+    if (updatedSchedule.status === 'completed') {
         maintenanceHistory.push(updatedSchedule);
         maintenanceSchedules.splice(index, 1);
     } else {
@@ -66,9 +66,9 @@ export const cancelMaintenance = async (req: Request, res: Response) => {
         return res.status(404).json({ error: 'Maintenance schedule not found' });
     }
 
-    const cancelledSchedule = {
+    const cancelledSchedule: MaintenanceSchedule = {
         ...maintenanceSchedules[index],
-        status: 'cancelled',
+        status: 'cancelled' as const,
         updatedAt: new Date()
     };
 
